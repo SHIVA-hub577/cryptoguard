@@ -1,19 +1,95 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+declare global {
+  interface Window {
+    phoneEmailListener: (userObj: { user_json_url: string }) => void;
+  }
+}
 
 export function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // 1. Define the listener that phone.email will call upon successful verification
+    window.phoneEmailListener = (userObj) => {
+      const { user_json_url } = userObj;
+      console.log("Phone.Email verification successful. URL:", user_json_url);
+      
+      setIsLoading(true);
+      setErrorMsg('Phone verified. Finalizing login...');
+
+      // 2. Send the URL to your backend to securely fetch user data
+      // As per your guide, this is where you'd call your Node.js endpoint.
+      /*
+      fetch("http://localhost:5000/api/verify-phone", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_json_url })
+      })
+      .then(res => res.json())
+      .then(verifiedUser => {
+        console.log("Verified User from backend:", verifiedUser);
+        login(verifiedUser.phone_number); // Login with verified phone
+        navigate('/dashboard');
+      })
+      .catch(err => {
+        console.error(err);
+        setErrorMsg("Phone verification failed. Please try again.");
+        setIsLoading(false);
+      });
+      */
+
+      // 3. For hackathon demo: Simulate successful login after verification
+      setTimeout(() => {
+        login(`user_phone_${user_json_url.slice(-10)}`);
+        setIsLoading(false);
+        navigate('/dashboard');
+      }, 1500);
+    };
+
+    // 4. Dynamically load the phone.email script (React-friendly way)
+    const script = document.createElement('script');
+    script.src = "https://www.phone.email/sign_in_button_v1.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [login, navigate]);
+
+  const validateEmail = (email: string) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
+
+    if (!validateEmail(email)) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrorMsg('Password must be at least 8 characters.');
+      return;
+    }
+
     setIsLoading(true);
 
     // Simulate API call
@@ -46,6 +122,12 @@ export function AuthPage() {
             {isLogin ? 'Access your risk dashboard and AI insights.' : 'Start analyzing crypto risks today.'}
           </p>
         </div>
+
+        {errorMsg && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -80,20 +162,34 @@ export function AuthPage() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-3 bg-gradient-to-r from-brand-purple to-brand-cyan text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-purple/25 transition-all flex items-center justify-center gap-2 mt-6 disabled:opacity-70"
-          >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                {isLogin ? 'Sign In' : 'Create Account'} <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+            >
+              {isLoading && !errorMsg.startsWith('Phone') ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" /> Authenticating...
+                </>
+              ) : (
+                <>
+                  {isLogin ? 'Sign In' : 'Create Account'} <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </div>
         </form>
+
+        <div className="relative flex py-5 items-center">
+          <div className="flex-grow border-t border-border"></div>
+          <span className="flex-shrink mx-4 text-xs text-text-muted uppercase">Or</span>
+          <div className="flex-grow border-t border-border"></div>
+        </div>
+
+        {/* --- Phone.Email OTP Login Button --- */}
+        {/* This div is automatically detected by the phone.email script */}
+        <div className="pe_signin_button" data-client-id="11069078944237683366"></div>
 
         <div className="mt-6 pt-6 border-t border-border text-center">
           <p className="text-sm text-text-secondary">
