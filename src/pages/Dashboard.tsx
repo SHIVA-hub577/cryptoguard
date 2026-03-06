@@ -6,6 +6,7 @@ import { getMarketData } from '../services/api';
 import { calculateRiskScore } from '../utils/risk';
 import { AITradingSimModal } from '../components/AITradingSimModal';
 import { useNavigate } from 'react-router-dom';
+import { CryptoTicker } from '../components/CryptoTicker';
 
 export function Dashboard() {
   const [marketData, setMarketData] = useState<any[]>([]);
@@ -91,6 +92,8 @@ export function Dashboard() {
 
   return (
     <div className="space-y-8">
+      <CryptoTicker />
+      
       <div>
         <h1 className="font-display font-bold text-3xl mb-2">Dashboard Overview</h1>
         <p className="text-text-secondary">Real-time risk intelligence and portfolio surveillance.</p>

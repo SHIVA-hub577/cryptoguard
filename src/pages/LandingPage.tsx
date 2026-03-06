@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Shield, ArrowRight, Activity, Lock, BarChart3, TrendingUp, Github, Twitter, MessageCircle, Search, Brain, ShieldCheck, Send, Bitcoin, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { CryptoTicker } from '../components/CryptoTicker';
 
 export function LandingPage() {
   const { isAuthenticated } = useAuth();
@@ -239,28 +240,8 @@ export function LandingPage() {
       </section>
 
       {/* Ticker */}
-      <div className="w-full bg-bg-surface border-y border-border overflow-hidden py-3">
-        <div className="flex items-center gap-12 animate-marquee whitespace-nowrap">
-          {[1, 2, 3, 4].map((i) => (
-            <React.Fragment key={i}>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">BTC</span>
-                <span className="text-green-500 font-mono text-sm">$64,231.50 (+2.4%)</span>
-                <span className="px-2 py-0.5 bg-green-500/10 text-green-500 text-xs rounded border border-green-500/20">LOW RISK: 28</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">ETH</span>
-                <span className="text-green-500 font-mono text-sm">$3,450.12 (+1.8%)</span>
-                <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-500 text-xs rounded border border-yellow-500/20">MED RISK: 45</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">PEPE</span>
-                <span className="text-red-500 font-mono text-sm">$0.000008 (-12.4%)</span>
-                <span className="px-2 py-0.5 bg-red-500/10 text-red-500 text-xs rounded border border-red-500/20">HIGH RISK: 89</span>
-              </div>
-            </React.Fragment>
-          ))}
-        </div>
+      <div className="max-w-7xl mx-auto px-6 mb-12">
+        <CryptoTicker />
       </div>
 
       {/* How It Works Section */}

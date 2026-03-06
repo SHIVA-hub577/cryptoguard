@@ -1,5 +1,14 @@
 export const calculateRiskScore = (coinData: any) => {
-  if (!coinData) return { score: 0, breakdown: {} };
+  if (!coinData) return {
+    score: 0,
+    breakdown: {
+      volatility: 0,
+      liquidity: 0,
+      marketCap: 0,
+      sentiment: 0,
+      whaleActivity: 0
+    }
+  };
 
   let score = 50; // Base score
   const breakdown = {

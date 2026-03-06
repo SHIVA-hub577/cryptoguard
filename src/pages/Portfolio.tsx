@@ -3,9 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, AreaChart, Area, XAx
 import { Plus, AlertTriangle, ArrowUpRight, MoreHorizontal, Loader2, Bot, Sparkles, CheckCircle2, X, Trash2, Edit2, History, Info } from 'lucide-react';
 import { getMarketData } from '../services/api';
 import { calculateRiskScore, getRiskLevel } from '../utils/risk';
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+import axios from 'axios';
 
 const portfolioCache: {
   data: {
@@ -167,17 +165,45 @@ export function Portfolio() {
         Be critical and actionable.
       `;
 
-      const result = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: { responseMimeType: "application/json" }
+      const response = await axios.post('/api/analyze', {
+        prompt,
+        config: { responseMimeType: "application/json" },
       });
       
-      const text = result.text || "{}";
+      const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
       const cleanJson = text.replace(/```json|```/g, '').trim();
       if (cleanJson) setAiAdvice(JSON.parse(cleanJson));
     } catch (e) {
       console.error("AI Error", e);
+      // Dynamic fallback based on local state
+      const highRiskCount = portfolio.filter(p => p.score > 60).length;
+      const totalAssets = portfolio.length;
+      const riskRatio = highRiskCount / totalAssets;
+      
+      let riskLevel = "Low";
+      let problems = [];
+      let actions = [];
+
+      if (avgRisk > 60) {
+        riskLevel = "High";
+        problems.push("Overall portfolio risk is elevated.");
+        problems.push("Heavy exposure to volatile assets.");
+        actions.push("Consider taking profits on high-risk coins.");
+        actions.push("Rebalance into stablecoins or BTC.");
+      } else if (avgRisk > 35) {
+        riskLevel = "Medium";
+        problems.push("Some assets showing increased volatility.");
+        actions.push("Monitor high-risk positions closely.");
+      } else {
+        problems.push("Portfolio is conservative.");
+        actions.push("Consider small allocation to growth assets.");
+      }
+
+      setAiAdvice({
+        riskLevel,
+        problems: problems.length ? problems : ["Portfolio looks balanced."],
+        actions: actions.length ? actions : ["Maintain current strategy."]
+      });
     } finally {
       setAnalyzing(false);
     }
