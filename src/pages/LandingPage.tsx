@@ -48,21 +48,40 @@ export function LandingPage() {
           <a href="#features" className="hover:text-white transition-colors">Features</a>
           <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-bg-elevated transition-colors text-text-secondary hover:text-white"
+            className="p-2 rounded-full hover:bg-bg-elevated transition-colors text-text-secondary hover:text-white mr-1"
+            title="Toggle theme"
           >
             {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
-          <Link to="/auth" className="text-sm font-medium hover:text-white transition-colors">Log In</Link>
-          <Link
-            to="/dashboard"
-            onClick={(e) => handleAppClick(e, '/dashboard')}
-            className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 rounded-full text-white font-semibold text-sm transition-all transform hover:-translate-y-0.5"
-          >
-            Launch App
-          </Link>
+
+          {isAuthenticated ? (
+            <Link
+              to="/dashboard"
+              className="px-6 py-2.5 bg-gradient-to-r from-brand-purple via-brand-glow to-brand-cyan hover:opacity-95 rounded-full text-white font-semibold text-sm transition-all shadow-lg shadow-brand-purple/25 flex items-center gap-2"
+            >
+              <span>Dashboard</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link
+                to="/auth?mode=login"
+                className="px-4 py-2 text-sm font-semibold text-text-secondary hover:text-white transition-colors"
+              >
+                Log In
+              </Link>
+              <Link
+                to="/auth?mode=signup"
+                className="px-5 py-2.5 bg-gradient-to-r from-brand-purple via-brand-glow to-brand-cyan hover:opacity-95 rounded-full text-white font-semibold text-sm transition-all shadow-lg shadow-brand-purple/25 flex items-center gap-2 cursor-pointer transform hover:-translate-y-0.5"
+              >
+                <span>Create Account</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          )}
         </div>
       </nav>
 

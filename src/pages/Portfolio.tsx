@@ -35,13 +35,88 @@ const PortfolioRowSkeleton = () => (
   </tr>
 );
 
+const COMMON_TICKER_MAP: Record<string, { id: string; name: string; sym: string; color: string }> = {
+  btc: { id: 'bitcoin', name: 'Bitcoin', sym: 'BTC', color: '#F7931A' },
+  bitcoin: { id: 'bitcoin', name: 'Bitcoin', sym: 'BTC', color: '#F7931A' },
+  eth: { id: 'ethereum', name: 'Ethereum', sym: 'ETH', color: '#627EEA' },
+  ethereum: { id: 'ethereum', name: 'Ethereum', sym: 'ETH', color: '#627EEA' },
+  sol: { id: 'solana', name: 'Solana', sym: 'SOL', color: '#14F195' },
+  solana: { id: 'solana', name: 'Solana', sym: 'SOL', color: '#14F195' },
+  ada: { id: 'cardano', name: 'Cardano', sym: 'ADA', color: '#0033AD' },
+  cardano: { id: 'cardano', name: 'Cardano', sym: 'ADA', color: '#0033AD' },
+  xrp: { id: 'ripple', name: 'XRP', sym: 'XRP', color: '#23292F' },
+  ripple: { id: 'ripple', name: 'XRP', sym: 'XRP', color: '#23292F' },
+  doge: { id: 'dogecoin', name: 'Dogecoin', sym: 'DOGE', color: '#C2A633' },
+  dogecoin: { id: 'dogecoin', name: 'Dogecoin', sym: 'DOGE', color: '#C2A633' },
+  dot: { id: 'polkadot', name: 'Polkadot', sym: 'DOT', color: '#E6007A' },
+  polkadot: { id: 'polkadot', name: 'Polkadot', sym: 'DOT', color: '#E6007A' },
+  bnb: { id: 'binancecoin', name: 'BNB', sym: 'BNB', color: '#F3BA2F' },
+  binancecoin: { id: 'binancecoin', name: 'BNB', sym: 'BNB', color: '#F3BA2F' },
+  link: { id: 'chainlink', name: 'Chainlink', sym: 'LINK', color: '#2A5ADA' },
+  chainlink: { id: 'chainlink', name: 'Chainlink', sym: 'LINK', color: '#2A5ADA' },
+  pepe: { id: 'pepe', name: 'Pepe', sym: 'PEPE', color: '#E01F1F' },
+  shib: { id: 'shiba-inu', name: 'Shiba Inu', sym: 'SHIB', color: '#FFA409' },
+  'shiba-inu': { id: 'shiba-inu', name: 'Shiba Inu', sym: 'SHIB', color: '#FFA409' },
+  avax: { id: 'avalanche-2', name: 'Avalanche', sym: 'AVAX', color: '#E84142' },
+  avalanche: { id: 'avalanche-2', name: 'Avalanche', sym: 'AVAX', color: '#E84142' },
+  matic: { id: 'matic-network', name: 'Polygon', sym: 'POL', color: '#8247E5' },
+  polygon: { id: 'matic-network', name: 'Polygon', sym: 'POL', color: '#8247E5' },
+  pol: { id: 'matic-network', name: 'Polygon', sym: 'POL', color: '#8247E5' },
+  near: { id: 'near', name: 'NEAR Protocol', sym: 'NEAR', color: '#000000' },
+  trx: { id: 'tron', name: 'TRON', sym: 'TRX', color: '#FF0013' },
+  tron: { id: 'tron', name: 'TRON', sym: 'TRX', color: '#FF0013' },
+  ton: { id: 'the-open-network', name: 'Toncoin', sym: 'TON', color: '#0098EA' },
+  toncoin: { id: 'the-open-network', name: 'Toncoin', sym: 'TON', color: '#0098EA' },
+  sui: { id: 'sui', name: 'Sui', sym: 'SUI', color: '#4DA2FF' },
+  apt: { id: 'aptos', name: 'Aptos', sym: 'APT', color: '#2ED8A7' },
+  aptos: { id: 'aptos', name: 'Aptos', sym: 'APT', color: '#2ED8A7' },
+  usdt: { id: 'tether', name: 'Tether', sym: 'USDT', color: '#26A17B' },
+  tether: { id: 'tether', name: 'Tether', sym: 'USDT', color: '#26A17B' },
+  usdc: { id: 'usd-coin', name: 'USD Coin', sym: 'USDC', color: '#2775CA' },
+};
+
+const findCoinData = (query: string, dataList: any[]) => {
+  if (!query || !dataList || dataList.length === 0) return null;
+  const q = query.toLowerCase().trim();
+
+  // 1. Check common ticker map
+  const mapped = COMMON_TICKER_MAP[q];
+  if (mapped) {
+    const found = dataList.find((c: any) => 
+      c.id?.toLowerCase() === mapped.id || 
+      c.symbol?.toLowerCase() === mapped.sym.toLowerCase()
+    );
+    if (found) return found;
+  }
+
+  // 2. Direct match on id, symbol, or name
+  return dataList.find((c: any) => 
+    c.id?.toLowerCase() === q ||
+    c.symbol?.toLowerCase() === q ||
+    c.name?.toLowerCase() === q
+  ) || null;
+};
+
 const initialHoldings = [
-  { id: 'bitcoin', name: 'Bitcoin', sym: 'BTC', amount: 0.45, color: '#F7931A' },
-  { id: 'ethereum', name: 'Ethereum', sym: 'ETH', amount: 6.2, color: '#627EEA' },
-  { id: 'solana', name: 'Solana', sym: 'SOL', amount: 45, color: '#14F195' },
-  { id: 'chainlink', name: 'Chainlink', sym: 'LINK', amount: 120, color: '#2A5ADA' },
-  { id: 'pepe', name: 'Pepe', sym: 'PEPE', amount: 500000000, color: '#E01F1F' },
+  { id: 'bitcoin', name: 'Bitcoin', sym: 'BTC', amount: 0.45, price: 85000, purchasePrice: 85000, color: '#F7931A' },
+  { id: 'ethereum', name: 'Ethereum', sym: 'ETH', amount: 6.2, price: 2700, purchasePrice: 2700, color: '#627EEA' },
+  { id: 'solana', name: 'Solana', sym: 'SOL', amount: 45, price: 140, purchasePrice: 140, color: '#14F195' },
+  { id: 'chainlink', name: 'Chainlink', sym: 'LINK', amount: 120, price: 15, purchasePrice: 15, color: '#2A5ADA' },
+  { id: 'pepe', name: 'Pepe', sym: 'PEPE', amount: 500000000, price: 0.000008, purchasePrice: 0.000008, color: '#E01F1F' },
 ];
+
+const loadSavedHoldings = () => {
+  try {
+    const saved = localStorage.getItem('cryptoguard_holdings');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    console.error('Failed to load saved holdings', e);
+  }
+  return initialHoldings;
+};
 
 const historyData = [
   { date: 'Jan', value: 45000 },
@@ -61,7 +136,8 @@ export function Portfolio() {
   const [allocationData, setAllocationData] = useState<any[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<any>(null);
-  const [holdings, setHoldings] = useState(initialHoldings);
+  const [holdings, setHoldings] = useState(loadSavedHoldings);
+  const [marketCoins, setMarketCoins] = useState<any[]>([]);
 
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -75,29 +151,28 @@ export function Portfolio() {
   useEffect(() => {
     const fetchPortfolioData = async () => {
       setLoading(true);
-      const now = Date.now();
-      // Use cache if data is less than 5 minutes old
-      if (portfolioCache.data && (now - portfolioCache.timestamp < 300000)) {
-        const { portfolio, totalValue, avgRisk, allocationData } = portfolioCache.data;
-        setPortfolio(portfolio);
-        setTotalValue(totalValue);
-        setAvgRisk(avgRisk);
-        setAllocationData(allocationData);
-        setLoading(false);
-        return;
-      }
 
       try {
-        // Simulating a slightly longer load time to see skeletons
-        await new Promise(res => setTimeout(res, 500));
-        const data = await getMarketData({ per_page: 100 });
+        let data = marketCoins;
+        if (!data || data.length === 0) {
+          // Simulating a slightly longer load time to see skeletons on initial load
+          await new Promise(res => setTimeout(res, 300));
+          data = await getMarketData({ per_page: 100 });
+          setMarketCoins(data);
+        }
+
         let total = 0;
         let totalRisk = 0;
 
         const newPortfolio = holdings.map(holding => {
-          const coinData = data.find((c: any) => c.id === holding.id);
-          const price = coinData?.current_price || 0;
-          const value = holding.amount * price;
+          const coinData = findCoinData(holding.id, data) || 
+                           findCoinData(holding.sym, data) || 
+                           findCoinData(holding.name, data);
+
+          // Priority: live market current_price > holding.purchasePrice > holding.price > 0
+          const livePrice = (coinData?.current_price && coinData.current_price > 0) ? coinData.current_price : 0;
+          const price = livePrice > 0 ? livePrice : (holding.purchasePrice || holding.price || 0);
+          const value = (holding.amount || 0) * price;
           const change = coinData?.price_change_percentage_24h || 0;
           const scoreData = coinData ? calculateRiskScore(coinData) : { score: 50 };
           const score = scoreData?.score || 50;
@@ -128,15 +203,6 @@ export function Portfolio() {
 
         setAllocationData(alloc);
         setPortfolio(newPortfolio);
-
-        // Save processed data to cache
-        portfolioCache.data = {
-          portfolio: newPortfolio,
-          totalValue: total,
-          avgRisk: Math.round(totalRisk / (holdings.length || 1)),
-          allocationData: alloc
-        };
-        portfolioCache.timestamp = now;
       } catch (err) {
         console.error("Failed to load portfolio", err);
       } finally {
@@ -211,32 +277,63 @@ export function Portfolio() {
 
   const handleAddHolding = (e: React.FormEvent) => {
     e.preventDefault();
-    const id = newCoin.name.toLowerCase().replace(/\s+/g, '-');
+    const query = newCoin.name.trim();
+    if (!query) return;
+
+    const matched = findCoinData(query, marketCoins);
+    const mapped = COMMON_TICKER_MAP[query.toLowerCase()];
+
+    const id = matched?.id || mapped?.id || query.toLowerCase().replace(/\s+/g, '-');
+    const name = matched?.name || mapped?.name || newCoin.name;
+    const sym = matched?.symbol?.toUpperCase() || mapped?.sym || query.slice(0, 4).toUpperCase();
+    
+    // Purchase price entered by user, or live price from matched coin
+    const enteredPrice = parseFloat(newCoin.price);
+    const livePrice = matched?.current_price || 0;
+    const price = !isNaN(enteredPrice) && enteredPrice > 0 ? enteredPrice : livePrice;
+
     const newHolding = {
       id,
-      name: newCoin.name,
-      sym: newCoin.name.substring(0, 3).toUpperCase(),
-      amount: parseFloat(newCoin.amount),
-      color: '#8C8C8C' // Default color
+      name,
+      sym,
+      amount: parseFloat(newCoin.amount) || 0,
+      price,
+      purchasePrice: price,
+      color: mapped?.color || '#8C8C8C'
     };
+
+    const updated = [...holdings, newHolding];
+    setHoldings(updated);
+    try {
+      localStorage.setItem('cryptoguard_holdings', JSON.stringify(updated));
+    } catch (err) {
+      console.error(err);
+    }
     
-    setHoldings([...holdings, newHolding]);
+    portfolioCache.data = null;
     setIsAddModalOpen(false);
     setNewCoin({ name: '', amount: '', price: '', date: '' });
-    // Invalidate cache to force refresh
-    portfolioCache.data = null;
   };
 
   const handleDeleteAsset = (id: string) => {
-    setHoldings(holdings.filter(h => h.id !== id));
-    // Invalidate cache
+    const updated = holdings.filter(h => h.id !== id);
+    setHoldings(updated);
+    try {
+      localStorage.setItem('cryptoguard_holdings', JSON.stringify(updated));
+    } catch (err) {
+      console.error(err);
+    }
     portfolioCache.data = null;
   };
 
   const handleUpdateAmount = (id: string, newAmount: number) => {
-    setHoldings(holdings.map(h => h.id === id ? { ...h, amount: newAmount } : h));
-    setEditingId(null);
-    // Invalidate cache
+    const updated = holdings.map(h => h.id === id ? { ...h, amount: newAmount } : h);
+    setHoldings(updated);
+    try {
+      localStorage.setItem('cryptoguard_holdings', JSON.stringify(updated));
+    } catch (err) {
+      console.error(err);
+    }
     portfolioCache.data = null;
   };
 
@@ -513,16 +610,64 @@ export function Portfolio() {
             <h3 className="font-display font-bold text-xl mb-4">Add New Holding</h3>
             <form onSubmit={handleAddHolding} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Coin Name</label>
+                <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Coin Name or Ticker</label>
                 <input 
                   type="text" 
                   required
-                  placeholder="e.g. Bitcoin"
+                  list="crypto-suggestions"
+                  placeholder="e.g. Bitcoin, BTC, Solana, or SOL"
                   value={newCoin.name}
-                  onChange={e => setNewCoin({...newCoin, name: e.target.value})}
-                  className="w-full bg-bg-elevated border border-border rounded-xl p-3 text-sm focus:border-orange-500 outline-none"
+                  onChange={e => {
+                    const val = e.target.value;
+                    const matched = findCoinData(val, marketCoins);
+                    if (matched && matched.current_price && (!newCoin.price || newCoin.price === '0')) {
+                      setNewCoin({ ...newCoin, name: val, price: matched.current_price.toString() });
+                    } else {
+                      setNewCoin({ ...newCoin, name: val });
+                    }
+                  }}
+                  className="w-full bg-bg-elevated border border-border rounded-xl p-3 text-sm focus:border-brand-purple outline-none text-white"
                 />
+                <datalist id="crypto-suggestions">
+                  <option value="Bitcoin (BTC)" />
+                  <option value="Ethereum (ETH)" />
+                  <option value="Solana (SOL)" />
+                  <option value="Cardano (ADA)" />
+                  <option value="Ripple (XRP)" />
+                  <option value="Dogecoin (DOGE)" />
+                  <option value="Polkadot (DOT)" />
+                  <option value="BNB (BNB)" />
+                  <option value="Chainlink (LINK)" />
+                  <option value="Avalanche (AVAX)" />
+                  <option value="Polygon (POL)" />
+                  <option value="Shiba Inu (SHIB)" />
+                  <option value="Pepe (PEPE)" />
+                  <option value="Sui (SUI)" />
+                  <option value="Toncoin (TON)" />
+                  <option value="Near (NEAR)" />
+                  <option value="Tether (USDT)" />
+                  <option value="USD Coin (USDC)" />
+                </datalist>
+
+                {/* Live Match Indicator */}
+                {(() => {
+                  const matched = findCoinData(newCoin.name, marketCoins);
+                  if (matched) {
+                    return (
+                      <div className="mt-2 p-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-xs flex items-center justify-between">
+                        <span className="text-green-400 font-medium">
+                          ✓ Identified: <strong className="text-white">{matched.name}</strong> ({matched.symbol.toUpperCase()})
+                        </span>
+                        <span className="text-white font-mono font-bold">
+                          ${matched.current_price?.toLocaleString()}
+                        </span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
+
               <div>
                 <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Amount</label>
                 <input 
@@ -532,9 +677,10 @@ export function Portfolio() {
                   placeholder="0.00"
                   value={newCoin.amount}
                   onChange={e => setNewCoin({...newCoin, amount: e.target.value})}
-                  className="w-full bg-bg-elevated border border-border rounded-xl p-3 text-sm focus:border-orange-500 outline-none"
+                  className="w-full bg-bg-elevated border border-border rounded-xl p-3 text-sm focus:border-brand-purple outline-none text-white"
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Purchase Price ($)</label>
@@ -544,8 +690,9 @@ export function Portfolio() {
                     placeholder="0.00"
                     value={newCoin.price}
                     onChange={e => setNewCoin({...newCoin, price: e.target.value})}
-                    className="w-full bg-bg-elevated border border-border rounded-xl p-3 text-sm focus:border-orange-500 outline-none"
+                    className="w-full bg-bg-elevated border border-border rounded-xl p-3 text-sm focus:border-brand-purple outline-none text-white"
                   />
+                  <span className="text-[10px] text-text-muted mt-1 block">Live price auto-filled or custom</span>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-text-secondary uppercase mb-1">Date Purchased</label>
@@ -554,11 +701,12 @@ export function Portfolio() {
                     max={new Date().toISOString().split('T')[0]}
                     value={newCoin.date}
                     onChange={e => setNewCoin({...newCoin, date: e.target.value})}
-                    className="w-full bg-bg-elevated border border-border rounded-xl p-3 text-sm focus:border-orange-500 outline-none text-text-secondary"
+                    className="w-full bg-bg-elevated border border-border rounded-xl p-3 text-sm focus:border-brand-purple outline-none text-text-secondary"
                   />
                 </div>
               </div>
-              <button type="submit" className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold mt-2">
+
+              <button type="submit" className="w-full py-3 bg-brand-purple hover:bg-brand-purple/90 text-white rounded-xl font-bold mt-2 transition-colors cursor-pointer shadow-lg shadow-brand-purple/20">
                 Add Asset
               </button>
             </form>
