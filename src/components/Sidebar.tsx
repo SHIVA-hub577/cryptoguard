@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Search, Briefcase, FileText, Bot, Settings, LogOut, Shield } from 'lucide-react';
+import { LayoutDashboard, Search, Briefcase, GraduationCap, FileText, Bot, Settings, LogOut, Shield } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,6 +8,7 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   { icon: Search, label: 'Coin Scanner', path: '/scanner' },
   { icon: Briefcase, label: 'Portfolio', path: '/portfolio' },
+  { icon: GraduationCap, label: 'Learn Hub', path: '/learn' },
   { icon: FileText, label: 'Reports', path: '/reports' },
   { icon: Bot, label: 'AI Assistant', path: '/assistant' },
 ];

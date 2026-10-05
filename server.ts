@@ -1,19 +1,23 @@
+import "dotenv/config";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import axios from "axios";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { connectDB } from "./server/db";
+import { authRouter } from "./server/authRoutes";
 
 // Simple in-memory cache to avoid rate limits (60 seconds TTL)
 const apiCache = new Map<string, { timestamp: number; data: any }>();
 const CACHE_DURATION = 5 * 60 * 1000; // Increased to 5 minutes to prevent rate limits
 
 async function startServer() {
+  await connectDB();
   const app = express();
   const PORT = 3001;
 
   app.use(express.json());
+
+  // Mount Authentication & Session Routes
+  app.use("/api/auth", authRouter);
 
   // API Routes
   app.get("/api/health", (req, res) => {
@@ -150,7 +154,8 @@ async function startServer() {
         return res.json(cached.data);
       }
 
-      if (!process.env.GEMINI_API_KEY) {
+      const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) {
         throw new Error("GEMINI_API_KEY is not set in server environment");
       }
 
@@ -160,7 +165,7 @@ async function startServer() {
       };
 
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         payload,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -186,9 +191,10 @@ async function startServer() {
     app.use(vite.middlewares);
   }
 
+  const configuredKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Gemini API Key configured: ${!!process.env.GEMINI_API_KEY}`);
+    console.log(`Gemini API Key configured: ${!!configuredKey}`);
   });
 }
 

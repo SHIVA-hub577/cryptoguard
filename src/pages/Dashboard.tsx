@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, Activity, ArrowUpRight, ArrowDownRight, Shield, Bot, Loader2 } from 'lucide-react';
+import { AlertTriangle, Activity, ArrowUpRight, ArrowDownRight, Shield, Bot, Loader2, GraduationCap, BookOpen, CheckCircle2 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart, Pie, Cell, Legend } from 'recharts';
 import { getMarketData } from '../services/api';
 import { calculateRiskScore } from '../utils/risk';
 import { AITradingSimModal } from '../components/AITradingSimModal';
 import { useNavigate } from 'react-router-dom';
 import { CryptoTicker } from '../components/CryptoTicker';
+import { useLearnProgress } from '../utils/learnProgress';
 
 export function Dashboard() {
+  const { stats } = useLearnProgress();
   const [marketData, setMarketData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +130,64 @@ export function Dashboard() {
           </motion.div>
         ))}
       </div>
+
+      {/* Learn Hub Spotlight Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-bg-surface via-bg-elevated to-bg-surface border border-brand-purple/30 p-6 shadow-xl"
+      >
+        <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-brand-purple/15 rounded-full blur-2xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3.5 rounded-2xl bg-brand-purple/20 border border-brand-purple/30 text-brand-glow flex-shrink-0">
+              <GraduationCap className="w-8 h-8 text-brand-purple" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-brand-cyan bg-brand-cyan/10 px-2.5 py-0.5 rounded-md border border-brand-cyan/20">
+                  New Feature
+                </span>
+                <span className="text-xs text-text-muted">• 5-Week Trading Masterclass</span>
+              </div>
+              <h3 className="font-display font-bold text-xl text-white">
+                Learn Hub: Structured Stock & Crypto Trading Roadmap
+              </h3>
+              <p className="text-xs text-text-secondary max-w-2xl leading-relaxed">
+                Master order books, candlestick analysis, RSI/MACD indicators, tokenomics valuation, and institutional risk management with embedded video lectures and interactive progress tracking.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 flex-shrink-0">
+            {/* Mini Progress Card */}
+            <div className="bg-bg-void/70 border border-border rounded-xl px-4 py-3 space-y-1.5 min-w-[180px]">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-secondary font-medium">Roadmap Progress</span>
+                <span className="font-bold text-brand-cyan font-mono">{stats.overallPercent}%</span>
+              </div>
+              <div className="w-full bg-bg-elevated rounded-full h-2 overflow-hidden border border-border/40">
+                <div
+                  className="h-full bg-gradient-to-r from-brand-purple to-brand-cyan rounded-full transition-all duration-300"
+                  style={{ width: `${stats.overallPercent}%` }}
+                />
+              </div>
+              <span className="text-[10px] text-text-muted font-mono block">
+                {stats.completedTopicsCount} of {stats.totalTopics} Topics Completed
+              </span>
+            </div>
+
+            <button
+              onClick={() => navigate('/learn')}
+              className="px-5 py-3 rounded-xl bg-brand-purple hover:bg-brand-purple/90 text-white text-xs font-bold tracking-wide transition-all shadow-lg hover:shadow-brand-purple/25 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>{stats.overallPercent > 0 ? 'Continue Roadmap' : 'Start Learning'}</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Chart */}

@@ -63,7 +63,11 @@ To run CryptoGuard locally:
 3.  **Set up Environment Variables**
     Create a `.env` file in the root:
     ```env
-    VITE_GEMINI_API_KEY=your_api_key_here
+    VITE_GEMINI_API_KEY=your_gemini_api_key
+    GEMINI_API_KEY=your_gemini_api_key
+    MONGO_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/cryptoguard
+    GOOGLE_USER=your_email@gmail.com
+    GMAIL_APP_PASSWORD=your_16_char_google_app_password
     ```
 4.  **Run the app**
     ```bash
@@ -262,20 +266,38 @@ CryptoGuard notifies users about:
 
 ---
 
+## 🎓 Learn Hub (Trading Masterclass)
+
+A structured 5-week curriculum empowering users to learn stock market & crypto trading from beginner fundamentals to institutional execution.
+
+Features:
+* **5-Week Roadmap**:
+  * **Week 1**: Basics of Stock Market & Crypto (Order books, blockchain, wallets, market caps)
+  * **Week 2**: Technical Analysis (Candlesticks, support/resistance, RSI, MACD, moving averages)
+  * **Week 3**: Fundamental Analysis (Tokenomics, vesting schedules, TVL, honeypot detection)
+  * **Week 4**: Risk Management & Trading Strategies (1% rule, R:R math, trading psychology, OpSec)
+  * **Week 5**: Advanced Trading & Real-World Practice (Paper trading, perpetuals, funding rates, journaling)
+* **Embedded YouTube Video Lectures**: Play high-yield educational videos directly in-app without redirects.
+* **Curated Article Library**: Deep-dive reading materials from Binance Academy, Investopedia, CoinGecko, and Coinglass with instant takeaways.
+* **Persistent Progress Tracking**: Check off topics, videos, and articles with automatic `localStorage` persistence, progress bars, and dashboard sync.
+
+---
+
 # 🖥️ Platform Pages
 
 CryptoGuard includes the following modules:
 
-| Page               | Description                         |
-| ------------------ | ----------------------------------- |
-| Landing Page       | Explains product and features       |
-| Login Page         | Secure authentication               |
-| Dashboard          | Overview of market risk and alerts  |
-| Risk Scanner       | Analyze individual cryptocurrencies |
-| Portfolio Analyzer | Manage and analyze holdings         |
-| Reports            | Historical risk analytics           |
-| AI Assistant       | AI-powered investment guidance      |
-| Settings           | User preferences and alerts         |
+| Page               | Description                                            |
+| ------------------ | ------------------------------------------------------ |
+| Landing Page       | Explains product and features                          |
+| Login Page         | Secure authentication                                  |
+| Dashboard          | Overview of market risk, whale alerts & Learn Hub sync |
+| Risk Scanner       | Analyze individual cryptocurrencies                    |
+| Portfolio Analyzer | Manage and analyze holdings                            |
+| Learn Hub          | 5-Week stock & crypto trading roadmap with videos      |
+| Reports            | Historical risk analytics                              |
+| AI Assistant       | AI-powered investment guidance                         |
+| Settings           | User preferences and alerts                            |
 
 ---
 
@@ -287,16 +309,19 @@ CryptoGuard includes the following modules:
 * Tailwind CSS
 * Recharts (Data Visualization)
 
-### Backend
+### Backend & Database
 
-* Node.js
-* Express.js
+* Node.js & Express.js
+* MongoDB Atlas & Mongoose
+* Database Session Management with auto-expiring TTL
+* Nodemailer & Gmail SMTP for secure Email OTP Verification
+* Bcrypt.js password hashing
 
 ### APIs
 
-* CoinGecko API (market data)
-* Whale Alert API (large transactions)
-* AI APIs (market analysis)
+* CoinGecko API (market data proxy)
+* Google Gemini API (AI risk analysis & portfolio assistant)
+* Gmail SMTP Service (Email OTP delivery)
 
 ---
 
@@ -387,4 +412,4 @@ CryptoGuard transforms raw blockchain and market data into **clear, actionable r
 
 ---
 
-If you want, I can also give you a **2-minute hackathon pitch script** (this dramatically increases your chances of winning).
+
